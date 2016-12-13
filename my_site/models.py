@@ -51,7 +51,7 @@ class Computer(models.Model):
         max_length=500, default='No description yet')
     type = models.CharField(
         max_length=30, choices=computer_types, default=PersonalComputer)
-    pic = models.ImageField(upload_to='/Users/hp/PycharmProjects/hw/hw/media', blank=True, max_length=1000)
+    pic = models.ImageField(upload_to='media/', blank=True, max_length=1000)
     quantity = models.IntegerField(null=True, default=0)
 
     def __str__(self):

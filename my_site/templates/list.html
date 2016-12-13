@@ -195,17 +195,17 @@
                     errors = '';
                     var ele = $('#id_name');
                     if ((ele.val().length == 0) || (ele.val().length > 255)) {
-                        errors += "Wrong username (too long or too short)"
+                        errors += "Wrong username (too long or too short); "
                     }
                     var i;
                     for (i = 0; i < computers.length; i++) {
                         if (ele.val() == computers[i]) {
-                            errors += "Such computer already exists"
+                            errors += "Such computer already exists; "
                         }
                     }
                     var input = $('input[type=file]');
                     if (input.val().length == 0) {
-                        errors += "Add picture, please"
+                        errors += "Add picture, please; "
                     }
                     if (errors != '') {
                         $('#msg').html(errors);

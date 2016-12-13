@@ -3,7 +3,9 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.files import File
+from django.core.files.storage import FileSystemStorage
+
 
 
 class LoginForm(forms.Form):
@@ -124,3 +126,20 @@ class ComputerForm(forms.ModelForm):
     class Meta(object):
         model = Computer
         fields = ['name', 'price', 'pic', 'description', 'quantity', 'type']
+
+    def save(self):
+        computer = Computer()
+        computer.name = self.cleaned_data.get('name')
+        computer.price = self.cleaned_data.get('price')
+        computer.type = self.cleaned_data.get('type')
+        computer.quantity = self.cleaned_data.get('quantity')
+        computer.description = self.cleaned_data.get('description')
+        f = self.cleaned_data.get("pic")
+        if f is None:
+            file_url = r'/default.jpg'
+        else:
+            file_url = r'/media/%s%s' % (computer.name, '.jpg')
+            filename = FileSystemStorage().save('/Users/hp/PycharmProjects/hw/' + file_url, File(f))
+        computer.pic = file_url
+        computer.save()
+

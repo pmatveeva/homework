@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Computer, BelongTO, Order, UserProfile
 from django.contrib.auth.admin import UserAdmin, User
+from .forms import ComputerForm
 
 
 class UserInline(admin.StackedInline):
@@ -33,6 +34,7 @@ class ComputerAdmin(admin.ModelAdmin):
     list_display = ('name',
                     'price',
                     'description',
+                    'pic',
                     'type',
                     'quantity',
                     'orders')
