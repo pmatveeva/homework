@@ -1,0 +1,43 @@
+{% load staticfiles %}
+{% csrf_token %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+    <link href="/static/css/jumbotron-narrow.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+
+</head>
+<body>
+<nav class="navbar navbar-default" style="position: static">
+    <div class="container-fluid">
+    <div class="navbar-header">
+        <div class="text-center">
+            <h3><a href="/main/1" class="link1"> Fashion is our profession </a></h3>
+        </div>
+    </div>
+        <div class="col-lg-offset-10">
+            {% if user.is_authenticated %}
+                <p class="user">You are signed in as {{ user.username }}</p>
+                <a href="/orders" class="btn btn-primary" role="button">Your orders</a>
+                <a href="/logout" class="btn btn-primary" role="button">Logout</a>
+            {% else %}
+                <p class="user">Welcome, Guest</p>
+                <a href="/login" class="btn btn-primary" role="button">Login</a>
+            {% endif %}
+
+            <br>
+        </div>
+    </div>
+</nav>
+{% block content %}{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="/static/js/bootstrap.js" type="text/javascript"></script>
+<script src="{% static 'js/maskedinput.js' %}"></script>
+<script src="{% static 'js/csrf.js' %}"></script>
+{% block javascript %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load floattags %}
+{% block title %}Become a member of our club{% endblock %}
+{% block content %}
+<form class="form-horizontal" id="sign_up" action="/reg/" method="POST">
+    {% csrf_token %}
+    <div class="form-group" id="err">
+        {% if form.errors%}
+            <div class="col-md-4 col-md-offset-2">
+                <div class="alert alert-warning">
+                    <a id="msg" class="close" data-dismiss="alert">×</a>
+                    {% for f in form %}
+                        {% if f.errors %}
+                            <p>{{ f.label }}</p>
+                            {% for e in f.errors %}
+                                <p>{{ e }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label">Login:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                {{ form.username }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label">Name:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                {{ form.name }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="enterSurname" class="col-xs-2 control-label">Surname:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                {{ form.surname }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="enterGender" class="col-xs-2 control-label">Gender:</label>
+        <div class="col-xs-4">
+            {% for radio in form.gender %}
+                <div class="myradio">
+                    {{ radio }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputEmail" class="col-xs-2 control-label">Email:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                {{ form.email }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputTelephone" class="col-xs-2 control-label">Telephone:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span>
+                {{ form.telephone }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputAddress" class="col-xs-2 control-label">Address:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+                {{ form.address }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputBirthday" class="col-xs-2 control-label">Birthday date:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-gift"></i></span>
+                {{ form.birth_date }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputPassword" class="col-xs-2 control-label">Password:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                {{ form.password }}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="confirmPassword" class="col-xs-2 control-label">Confirm password:</label>
+        <div class="col-xs-4">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                {{ form.password2 }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-5">
+            <button type="submit" class="btn btn-default">Registration</button>
+</form >
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function(){
+        $("#telephone").mask("+7(999) 999-9999");
+        $('#birth_date').mask("99/99/9999")
+        $("#msg").click(function() {
+            var el = document.getElementById("#sign_up")
+            $("#err").removeChild(el);
+        });
+    });
+
+</script>
+{% endblock %}

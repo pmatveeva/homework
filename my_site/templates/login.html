@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% csrf_token %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+    <form method="post" id="sign_in" name='sign_in' >
+        {% csrf_token %}
+        <div class="form-group" id="err" style="margin: 100px 375px 0px;">
+            {% if form.errors %}
+                <div class="alert alert-warning">
+                    <a href="" id='msg' class="close" data-dismiss="alert">&times;</a>
+                    {% for f in form %}
+                        {% if f.errors %}
+                            <p>{{ f.label }}</p>
+                            {% for e in f.errors %}
+                                <p>{{ e }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    {% for e in form.non_field_errors %}
+                        <p>{{ e }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <form class="form-inline">
+            <div class="form-inline"  style="margin: 0px 0px 0px 375px;">
+                <div class="form-group">
+                    <label class="sr-only" id="lg" >Login</label>
+                    <input type="text" class="form-control" placeholder=Login id="username" name="username">
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="inputPassword">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+                </div>
+                <div class="checkbox">
+                    <label><input name="remember" id="remember" type="checkbox">Remember me</label>
+                </div>
+                <button type="submit" class="btn btn-default">Sign in</button>
+            </div>
+        </form>
+        <div class="form-group" style="margin: 10px 0px 0px 375px;">
+            <label>Not a member?</label>
+            <a href="/reg">
+                <span style="color: #111;">Sign up here!</span>
+            </a>
+        </div>
+    </form>
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function(){
+        $("#msg").click(function() {
+            var el = document.getElementById("#sign_in")
+            $("#err").removeChild(el);
+        });
+    });
+</script>
+{% endblock %}
+
+

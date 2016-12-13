@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% csrf_token %}
+{% block title %}Products{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="blog-header">
+            <h1 style="font-family: Lobster; text-align: center">{{ computer.name }}</h1>
+        </div>
+        <div class="row">
+        <br>
+            <div class="col-lg-4">
+                <img src="{{ computer.pic }}" width="100%" border="10%"/>
+            </div>
+            <div class="col-lg-4">
+                <h4>{{ computer.name }} is a modern {{ computer.type }}.</h4>
+                <br>
+                <h5>{{ computer.description }}</h5>
+                <br>
+                <h4>Have already bought such users as:</h4>
+                {% for i in customers_list %}
+                    <h5>{{ i }}</h5>
+                {% endfor %}
+                <br>
+                <h4>Available: <span id="available">{{ computer.quantity }}</span></h4>
+            <br>
+                <h4>Price: {{ computer.price }}</h4>
+            </div>
+            <div class="col-md-offset-8">
+                {% if computer.quantity != 0 and user.username%}
+                    <a name='{{ computer.name }}' id='ord' class="btn btn-primary" >
+                        <h4><div  class="title">Order it!</div></h4>
+                    </a>
+                {% elif computer.quantity == 0%}
+                    <a class="btn btn-primary disabled" >
+                        <h4><div  class="title">Order it!</div></h4>
+                    </a>
+                {% else %}
+                    <div class="form-group" >
+                        <button class="btn btn-primary disabled" >
+                            <h4><div  class="title">Order it!</div></h4>
+                        </button>
+                        <label>You need to
+                            <a href="/login">
+                                <span style="color: #111;">sign in</span>
+                            </a>
+                            to order it
+                        </label>
+                    </div>
+                {% endif %}
+                <div id='myModal' class="modal fade">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                <h4 class="modal-title">Add to your order</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="enterName" class="col-xs-2 control-label">Name:</label>
+                                        <div class="col-xs-4" >
+                                            {{ computer.name }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="enterPrice" class="col-xs-2 control-label">Price:</label>
+                                        <div class="col-xs-4">
+                                            {{ computer.price }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="enterPrice" class="col-xs-2 control-label">Choose an order:</label>
+                                        <div class="col-xs-4">
+                                            <select class="form-control" id="select">
+                                                {% for o in client_orders %}
+                                                    {% if o.is_open %}
+                                                        <option>{{o.code}}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <a href='/main/add' type="button" class="btn btn-primary" id='add{{ item.name }}' >Add</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    <script>
+    $(document).ready(function(){
+        var o;
+         $('.col-md-offset-8').find('#ord').click(function(e) {
+            e.preventDefault();
+             o = $(this).attr('name');
+            $("#myModal").modal('show');
+             $('#add').click(function(e) {
+                 e.preventDefault();
+                 var ord_id = $("select option:selected").val() ;
+                 var count = parseInt($('#available').html())-1;
+                 var ord_data = {
+                     'ord_id': ord_id,
+                     'i_name': o,
+                 };
+                 $.post("/main/add", ord_data,
+                         function () {
+                             $('#available').html(String(count));
+                             if (count==0)
+                                 $('#add').hide();
+                                 $('.col-md-offset-8').find('#ord').attr('disabled', true);
+
+
+                 });
+             });
+
+         });
+    });
+
+    </script>
+{% endblock %}

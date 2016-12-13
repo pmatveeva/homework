@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% csrf_token %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="blog-header">
+            <h1 class="blog-title col-lg-offset-3"><b>Your orders</b></h1>
+        </div>
+        <table id ='orders' class="table table-striped table-hover ">
+            <thead>
+            <tr>
+                <th>Code</th>
+                <th>Date</th>
+                <th>Active</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for order in data %}
+            <tr>
+                <td>{{  order.code}}</td>
+                <td>{{ order.date}}</td>
+                <td id="is_open{{ order.code }}">
+                    {% if order.is_open %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>{{ order.total }}</td>
+                <td >
+                    {% if order.code not in empty_orders %}
+                        <button id="items" name='{{ order.code }}'  class="btn btn-primary">
+                            <div class="title">Items</div>
+                        </button>
+                    {% endif %}
+                </td>
+                <td class="foo">
+                    {% if order.is_open %}
+                    <a href="/orders/close-{{ order.code }}" id='{{ order.code }}' class="btn btn-primary" >
+                         <div class="title">Close</div>
+                    </a>
+                    {% endif %}
+                </td>
+                <td class="foo">
+                    <button href="/orders/delete-{{ order.code }}" id='del' name='{{ order.code }}' class="btn btn-primary" >
+                         <div class="title">Delete</div>
+                    </button>
+                </td>
+            </tr>
+                <div id='myModal{{ order.code }}' class="modal fade">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                <h4 class="modal-title">Order list</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-2 col-md-offset-1">
+                                        <h4>Code</h4>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h4>Price</h4>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h4>Quantity</h4>
+                                    </div>
+                                </div>
+                                {% for c in computers  %}
+                                    {% if c.order_id == order.code %}
+                                        <div class="row">
+                                        <div class="col-md-2 col-md-offset-1">
+                                            <h4>{{ c.item_id }}</h4>
+                                        </div>
+                                        <div class="col-md-2">
+                                            {% for key, value in prices.items %}
+                                                {% if key == c.item_id %}
+                                                <h4>{{ value }}</h4>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <h4 id='q_{{ c.item_id }}'>{{ c.quantity }}</h4>
+                                        </div>
+                                        <div class="col-md-2">
+                                             <a href="/orders/deleteitem/" id="item_del" name='{{ c.item_id }}' class="btn btn-primary" >Delete</a>
+                                        </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+{% block javascript %}
+    <script type="application/javascript">
+
+    $(document).ready(function() {
+        var ord_id
+        //модальное
+        $('#orders').find('>tbody>tr>td>button#items').click(function (e) {
+            e.preventDefault();
+            var ord_id = $(this).attr("name");
+            ord_id = String(ord_id);
+            $('#myModal' + ord_id).modal('show');
+            $('#myModal'+ord_id).on('shown.bs.modal', function () {
+                $('#myModal' + ord_id).find('a#item_del').click(function (e) {
+                    e.preventDefault();
+                    var item_to_del = $(this).attr("name");
+                    var quantity = $('#q_'+item_to_del).html();
+                    var new_quantity = parseInt(quantity)-1;
+                    var row = $(this).parent().parent();
+                    $.post("/orders/deleteitem/", {
+                                "ordercode": ord_id,
+                                'item': item_to_del
+                            },
+                            function () {
+                                if (new_quantity != 0)
+                                    $('#q_'+item_to_del).html(String(new_quantity));
+                                else
+                                    row.remove()
+                            });
+                });
+
+            });
+        });
+
+
+//закрытие заказа
+        $('#orders').find('>tbody>tr>td>a').click(function (e) {
+            e.preventDefault();
+            ord_id = $(this).attr("id");
+            var p = document.getElementById('is_open' + ord_id);
+            $(this).hide();
+            $.post("/orders/close-" + ord_id, {
+                        "ordercode": ord_id
+                    },
+                    function () {
+                        p.innerHTML = 'No';
+                    });
+        });
+//удаление заказа
+        $('#orders').find('>tbody>tr>td>button#del').click(function (e) {
+            e.preventDefault();
+            ord_id = $(this).attr("name");
+            var index = $(this).parent().parent();
+            $.post("/orders/delete-" + ord_id, {
+                        "ordercode": ord_id
+                    },
+                    function () {
+                        index.remove()
+                    });
+        });
+
+
+    })
+
+
+
+    </script>
+{% endblock %}

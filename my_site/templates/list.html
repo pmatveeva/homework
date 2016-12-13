@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% csrf_token %}
+{% block title %}Products{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="blog-header">
+            <h1 class="blog-title col-lg-offset-3"><b>Search results</b></h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 blog-main">
+                {% include 'list_object.html' with item=item %}
+                <div id="loading_block"></div>
+            </div>
+            <div class="col-lg-3 blog-sidebar">
+                <section class="panel panel-search">
+                    <div class="panel-heading bg-primary">
+                        <div class="panel-title">
+                            <h3><div class="title">Search</div></h3>
+                        </div>
+                    </div>
+                    <h4><div class="col-lg-offset-1">Filters</div></h4>
+                    <ol class="list-unstyled text-center">
+                        <li><a href="#">Price low to high</a></li>
+                        <li><a href="#">Price high to low</a></li>
+                        <li><a href="#">Popularity</a></li>
+                    </ol>
+                    <div class="panel-body bg-primary">
+                        <div class="input-group">
+                            <form data-key="2af70d95e12e1e4e9344fa7468f8213d00434d93" action="search" method="get" style="margin-bottom:10px;">
+                                <span class="input-group-btn">
+                                    <input type="text" class="form-control" name="query" placeholder="Enter here" value="" />
+                                    <button type="submit" class="btn btn-default">Find</button>
+                                </span>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="col-md-offset-2 col-md-2">
+                    {% if user.is_superuser %}
+                    <button id='addnew' class="btn btn-primary " >
+                        <h4><div  class="title">Add new computer</div></h4>
+                    </button>
+                     {% endif %}
+                    <div id='ModalNew' class="modal fade">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 class="modal-title">Add new</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form-horizontal clearfix" action="/create/" id="#new" enctype="multipart/form-data" name="form_add" method="POST">
+                                        {% csrf_token %}
+                                            {{ form.name }}
+                                        {{ form.pic }}
+                                        {{ form.price }}
+                                        {{ form.quantity }}
+                                        {{ form.description }}
+                                        {{ form.type }}
+
+                                        <button type="submit" class="btn btn-default" >Add</button>
+                                    </form>
+
+
+                                     <div class="alert alert-warning" id="error">
+                                         <a href=""  class="close" data-dismiss="alert">&times;</a>
+                                         <div id="msg"></div>
+                                     </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    <script>
+    var infinityList = {};
+        var pageHeight;
+        var winHeight;
+        function updateGeneral(infinityList){
+            pageHeight = parseInt($(document).height());
+            winHeight = parseInt($(window).height());
+        }
+        function init(infinityList){
+            $('#loading_block').hide();
+            updateGeneral(infinityList);
+            var scrollIndex = 1;
+            var error_lock = false;
+            var load_lock = false;
+            var end_of_list  = false;
+            $(document).scroll(function () {
+                var pos = parseInt($(document).scrollTop());
+                if ((pos + winHeight > pageHeight) &&
+                        (!load_lock) &&  (!end_of_list))
+                {
+                    $('#loading_block').show();
+                    scrollIndex++;
+                    console.log(scrollIndex);
+                    load_lock = true;
+                    $.ajax({
+                        url: '/main/' + scrollIndex,
+                        type: 'GET',
+                        data: {},
+                        dataType: 'text',
+                        timeout: 60000,
+                        success: function(response){
+                            if (response.trim() == 'Finish') {
+                                end_of_list = true;
+                            }else{
+                                $('#loading_block').before(response);
+                            }
+                            $('#loading_block').hide();
+                            updateGeneral(infinityList);
+                            load_lock = false;
+                        },
+                        error: function(){
+                            if (!error_lock) {
+
+                                error_lock = true;
+                                $(document).scrollTop(0);
+                                alert('ошибка');
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1);
+                            }
+                        }
+                    });
+                }else{
+                    $('#loading_block').hide();
+                }
+            });
+            $(window).resize(function () {
+                updateGeneral(infinityList);
+            });
+        }
+    $(document).ready(function() {
+        init(infinityList);
+        var o;
+        $('.col-md-offset-8').find('a#ord').click(function (e) {
+            e.preventDefault();
+            var order_button = $(this);
+            o = $(this).attr('name');
+            $("#myModal" + o).modal('show');
+            var but = $('#add' + o);
+            but.click(function (e) {
+                e.preventDefault();
+                var ord_id = $("select option:selected").val();
+                var count = parseInt($('#available' + o).html()) - 1;
+                var ord_data = {
+                    'ord_id': ord_id,
+                    'i_name': o,
+                };
+                $.post("/main/add", ord_data,
+                        function () {
+                            $('#available' + o).html(String(count));
+                            if (count == 0) {
+                                but.hide();
+                                order_button.attr('disabled', true);
+                            }
+
+
+                        });
+            })
+        });
+
+        $('#addnew').click(function (e) {
+            e.preventDefault();
+            $("#ModalNew").modal('show');
+
+            var computers;
+            $.ajax({
+                type: "GET",
+                url: "/computers",
+                success: function (data) {
+                    computers = data;
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+            $('#error').hide();
+            var errors = '';
+            $('#add').attr('disabled', 'True')
+            var jVal = {
+                'Form': function () {
+                    $('#error').hide();
+                    errors = '';
+                    var ele = $('#id_name');
+                    if ((ele.val().length == 0) || (ele.val().length > 255)) {
+                        errors += "Wrong username (too long or too short)"
+                    }
+                    var i;
+                    for (i = 0; i < computers.length; i++) {
+                        if (ele.val() == computers[i]) {
+                            errors += "Such computer already exists"
+                        }
+                    }
+                    var input = $('input[type=file]');
+                    if (input.val().length == 0) {
+                        errors += "Add picture, please"
+                    }
+                    if (errors != '') {
+                        $('#msg').html(errors);
+                        $('#error').attr('class', 'alert alert-warning');
+                        $('#error').show();
+                    }
+                    if (errors == '') {
+                        $('#msg').html('OK');
+                        $('#error').attr('class', 'alert alert-success');
+                        $('#error').show();
+                        $('#add').removeAttr('disabled');
+                    }
+                }
+            };
+            $('#id_name').change(jVal.Form);
+            $('input[type=file]').change(jVal.Form);
+            $('#modaltable').find('input, select').each(function () {
+                if ((($(this).attr('name') == 'price') || ($(this).attr('name')) == 'quantity') && ($(this).val() == '0')) {
+                    $(this).val(parseInt('0'));
+                }
+            })
+        })
+    })
+    </script>
+{% endblock %}
