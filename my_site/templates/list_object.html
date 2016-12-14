@@ -35,68 +35,8 @@
                 <div class="col-md-offset-4 col-md-2">
                     <h4>Price: {{ item.price }}</h4>
                 </div>
-                <div class="col-md-offset-8">
-                    {% if item.quantity != 0 and user.username%}
-                        <a name='{{ item.name }}' id='ord' class="btn btn-primary" >
-                            <h4><div  class="title">Order it!</div></h4>
-                        </a>
-                    {% elif item.quantity == 0 and not user.username%}
-                        <div class="form-group" >
-                            <button name='{{ item.name }}' id='ord1' class="btn btn-primary disabled" >
-                                <h4><div  class="title">Order it!</div></h4>
-                            </button>
-                            <label>You need to <a href="/login"> <span style="color: #111;">sign in</span></a> to order it </label>
-                        </div>
-                    {% else %}
-                        <a  class="btn btn-primary disabled" >
-                            <h4><div  class="title">Order it!</div></h4>
-                        </a>
-
-                    {% endif %}
-                    <div id='myModal{{ item.name }}' class="modal fade">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                    <h4 class="modal-title">Add to your order</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="form-horizontal">
-                                        <div class="form-group">
-                                            <label for="enterName" class="col-xs-2 control-label">Name:</label>
-                                            <div class="col-xs-4" >
-                                                {{ item.name }}
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="enterPrice" class="col-xs-2 control-label">Price:</label>
-                                            <div class="col-xs-4">
-                                                {{ item.price }}
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="enterPrice" class="col-xs-2 control-label">Choose an order:</label>
-                                            <div class="col-xs-4">
-                                                <select class="form-control" id="select">
-                                                    {% for o in client_orders %}
-                                                        {% if o.is_open %}
-                                                            <option>{{o.code}}</option>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                        <a href='/main/add' type="button" class="btn btn-primary" id='add{{ item.name }}' >Add</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
+        </div>
     </section>
 {% empty %}
     Finish

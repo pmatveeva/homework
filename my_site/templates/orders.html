@@ -27,7 +27,7 @@
                         No
                     {% endif %}
                 </td>
-                <td>{{ order.total }}</td>
+                <td id="total{{ order.code }}">{{ order.total }}</td>
                 <td >
                     {% if order.code not in empty_orders %}
                         <button id="items" name='{{ order.code }}'  class="btn btn-primary">
@@ -76,7 +76,7 @@
                                         <div class="col-md-2">
                                             {% for key, value in prices.items %}
                                                 {% if key == c.item_id %}
-                                                <h4>{{ value }}</h4>
+                                                <h4 id="price{{ c.item_id }}">{{ value }}</h4>
                                                 {% endif %}
                                             {% endfor %}
                                         </div>
@@ -119,14 +119,19 @@
                     var item_to_del = $(this).attr("name");
                     var quantity = $('#q_'+item_to_del).html();
                     var new_quantity = parseInt(quantity)-1;
+                    var total = $('#total'+ord_id).html();
+                    var price = $('#price'+item_to_del).html();
+                    var new_total = parseInt(total)-parseInt(price);
                     var row = $(this).parent().parent();
                     $.post("/orders/deleteitem/", {
                                 "ordercode": ord_id,
                                 'item': item_to_del
                             },
                             function () {
-                                if (new_quantity != 0)
-                                    $('#q_'+item_to_del).html(String(new_quantity));
+                                $('#total'+ord_id).html(String(new_total));
+                                if (new_quantity != 0) {
+                                    $('#q_' + item_to_del).html(String(new_quantity));
+                                }
                                 else
                                     row.remove()
                             });

@@ -7,7 +7,6 @@ from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 
 
-
 class LoginForm(forms.Form):
     password = forms.CharField(
         label='Password:',
@@ -139,7 +138,8 @@ class ComputerForm(forms.ModelForm):
             file_url = r'/default.jpg'
         else:
             file_url = r'/media/%s%s' % (computer.name, '.jpg')
-            filename = FileSystemStorage().save('/Users/hp/PycharmProjects/hw/' + file_url, File(f))
+            filename = FileSystemStorage().save(
+                '/Users/hp/PycharmProjects/hw/' + file_url,
+                File(f))
         computer.pic = file_url
         computer.save()
-

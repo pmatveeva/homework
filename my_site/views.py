@@ -8,13 +8,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout, authenticate
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.views.generic.edit import FormView, CreateView
+from django.views.generic.edit import FormView
 from django.views.generic import DetailView
 from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 from django.core.urlresolvers import reverse
-from django.core.files import File
-from django.core.files.storage import FileSystemStorage
 
 
 def registration(request):
@@ -29,25 +27,6 @@ def registration(request):
     return render(request, 'registration.html', {'form': form})
 
 
-def log(request):
-    username = request.GET.get('username', '')
-    password = request.GET.get('password', '')
-    if request.is_ajax():
-        form_l = LoginForm(request.GET).save(commit=False)
-
-        if form_l.is_valid():
-            user = authenticate(username=username, password=password)
-            if user:
-                auth.login(request, user)
-                if not request.GET.get('remember'):
-                    request.session.set_expiry(0)
-                return HttpResponseRedirect('/main')
-        return HttpResponse('error')
-    else:
-        form_l = LoginForm(request.POST)
-        return HttpResponse('oi')
-
-
 class SingIn(FormView):
     form_class = LoginForm
     template_name = 'login.html'
@@ -59,7 +38,7 @@ class SingIn(FormView):
                 auth.login(self.request, form.cleaned_data['user'])
                 if not self.request.POST.get('remember'):
                     self.request.session.set_expiry(0)
-                return HttpResponseRedirect('/main')
+                return HttpResponseRedirect('/main/1')
         else:
             form = LoginForm()
         return render(self.request, 'login.html', {'form': form})
@@ -214,12 +193,14 @@ def delete_item(request):
         item = request.POST.get('item')  # код компа
         relation = BelongTO.objects.get(
             order_id=code, item_id=item)  # все данные компьютеры заказа
+        computer = Computer.objects.get(name=item)
         if relation.quantity > 1:
             relation.quantity -= 1
             relation.save()
         else:
             relation.delete()
-
+        computer.quantity += 1
+        computer.save()
         return HttpResponse('ok')
     else:
         return HttpResponse('bad')
@@ -255,6 +236,14 @@ class OneItem(DetailView):
             if customer not in customers_list:
                 customers_list.append(customer)
         context['customers_list'] = customers_list
+        flag = 0
+        for order in Order.objects.filter(customer_id=self.request.user.id):
+            if order.is_open:
+                flag = 1
+        if not flag:
+            client_profile = UserProfile.objects.get(id=self.request.user.id)
+            order = Order(customer=client_profile)
+            order.save()
         context['client_orders'] = Order.objects.filter(
             customer_id=self.request.user.id)
         return context
@@ -265,7 +254,8 @@ def addnew(request):
         form = ComputerForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-        return HttpResponseRedirect(reverse('item_view', args=(form.cleaned_data['name'],)))
+        return HttpResponseRedirect(
+            reverse('item_view', args=(form.cleaned_data['name'],)))
 
 
 def list_computers(request):

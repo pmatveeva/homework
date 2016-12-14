@@ -52,14 +52,26 @@
                                 <div class="modal-body">
                                     <form class="form-horizontal clearfix" action="/create/" id="#new" enctype="multipart/form-data" name="form_add" method="POST">
                                         {% csrf_token %}
-                                            {{ form.name }}
-                                        {{ form.pic }}
-                                        {{ form.price }}
-                                        {{ form.quantity }}
-                                        {{ form.description }}
-                                        {{ form.type }}
+                                        <p>
+                                        <label class="col-xs-2 control-label">Name:</label>
+                                        {{ form.name }}</p>
+                                        <p>
+                                        <label class="col-xs-2 control-label">Picture:</label>
+                                        {{ form.pic }}</p>
+                                        <p>
+                                        <label class="col-xs-2 control-label">Price:</label>
+                                        {{ form.price }} </p>
+                                        <p>
+                                        <label class="col-xs-2 control-label">Quantity:</label>
+                                        {{ form.quantity }}</p>
+                                        <p>
+                                        <label class="col-xs-2 control-label">Description:</label>
+                                        {{ form.description }}</p>
+                                        <p>
+                                        <label class="col-xs-2 control-label">Type:</label>
+                                        {{ form.type }}</p>
 
-                                        <button type="submit" class="btn btn-default" >Add</button>
+                                        <button type="submit" class="btn btn-default col-md-offset-2" >Add</button>
                                     </form>
 
 
@@ -103,7 +115,6 @@
                 {
                     $('#loading_block').show();
                     scrollIndex++;
-                    console.log(scrollIndex);
                     load_lock = true;
                     $.ajax({
                         url: '/main/' + scrollIndex,
@@ -144,33 +155,6 @@
     $(document).ready(function() {
         init(infinityList);
         var o;
-        $('.col-md-offset-8').find('a#ord').click(function (e) {
-            e.preventDefault();
-            var order_button = $(this);
-            o = $(this).attr('name');
-            $("#myModal" + o).modal('show');
-            var but = $('#add' + o);
-            but.click(function (e) {
-                e.preventDefault();
-                var ord_id = $("select option:selected").val();
-                var count = parseInt($('#available' + o).html()) - 1;
-                var ord_data = {
-                    'ord_id': ord_id,
-                    'i_name': o,
-                };
-                $.post("/main/add", ord_data,
-                        function () {
-                            $('#available' + o).html(String(count));
-                            if (count == 0) {
-                                but.hide();
-                                order_button.attr('disabled', true);
-                            }
-
-
-                        });
-            })
-        });
-
         $('#addnew').click(function (e) {
             e.preventDefault();
             $("#ModalNew").modal('show');

@@ -113,9 +113,9 @@
                  $.post("/main/add", ord_data,
                          function () {
                              $('#available').html(String(count));
-                             if (count==0)
+                             if (count==0) {
                                  $('#add').hide();
-                                 $('.col-md-offset-8').find('#ord').attr('disabled', true);
+                                 $('.col-md-offset-8').find('#ord').attr('disabled', true);}
 
 
                  });

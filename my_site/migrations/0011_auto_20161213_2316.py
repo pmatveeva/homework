@@ -15,11 +15,20 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='computer',
             name='pic',
-            field=models.ImageField(blank=True, max_length=1000, upload_to='/Users/hp/PycharmProjects/hw/media'),
+            field=models.ImageField(
+                blank=True,
+                max_length=1000,
+                upload_to='/Users/hp/PycharmProjects/hw/media'),
         ),
         migrations.AlterField(
             model_name='computer',
             name='type',
-            field=models.CharField(choices=[('Personal Computer', 'Personal computer'), ('Laptop', 'Laptop'), ('Monoblock', 'Monoblock')], default='Personal Computer', max_length=30),
+            field=models.CharField(
+                choices=[
+                    ('Personal Computer', 'Personal computer'),
+                    ('Laptop', 'Laptop'),
+                    ('Monoblock', 'Monoblock')],
+                default='Personal Computer',
+                max_length=30),
         ),
     ]

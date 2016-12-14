@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^login/', views.SingIn.as_view()),
     url(r'^logout/', views.logout_view),
     url(r'^main/add', views.add),
-    url(r'^item-(?P<pk>[A-Za-z0-9-]+)$',
+    url(r'^item-(?P<pk>[A-Za-z0-9- ]+)$',
         views.OneItem.as_view(), name='item_view'),
     url(r'^create', views.addnew),
     url(r'^main/(?P<page_id>[0-9]+)', views.ItemsView.as_view()),
@@ -23,5 +23,3 @@ urlpatterns = [
             login_url='/login')(views.OrdersView.as_view())),
     url(r'^computers/', views.list_computers)
 ]
-
-
